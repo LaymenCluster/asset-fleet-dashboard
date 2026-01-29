@@ -1,30 +1,30 @@
-import { useState } from "react"
-import apiClient from "../api/apiClient"
-import { setToken } from "../api/auth"
+import { useState } from "react";
+import apiClient from "../api/apiClient";
+import { setToken } from "../api/auth";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
     try {
       const res = await apiClient.post("/auth/login", {
         email,
         password,
-      })
+      });
 
-      setToken(res.data.access_token)
-      window.location.href = "/dashboard"
+      setToken(res.data.access_token);
+      window.location.href = "/dashboard";
     } catch (err: any) {
-      setError("Invalid email or password")
+      setError("Invalid email or password");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -69,5 +69,5 @@ export default function Login() {
         </button>
       </form>
     </div>
-  )
+  );
 }

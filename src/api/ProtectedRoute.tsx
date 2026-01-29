@@ -1,10 +1,10 @@
-import { Navigate } from "react-router-dom"
-import type { ReactNode } from "react"
-import { getToken } from "./auth"
+import { Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
+import { getToken } from "./auth";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   if (!getToken()) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" replace />;
   }
-  return <>{children}</>
+  return <>{children}</>;
 }

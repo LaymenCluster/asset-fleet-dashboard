@@ -1,4 +1,4 @@
-import type { AlertItem } from "../../types/alert"
+import type { AlertItem } from "../../types/alert";
 
 const severityColors: Record<AlertItem["severity"], string> = {
   NONE: "border-gray-600 text-gray-400",
@@ -6,18 +6,18 @@ const severityColors: Record<AlertItem["severity"], string> = {
   MEDIUM: "border-yellow-500 text-yellow-400",
   HIGH: "border-orange-500 text-orange-400",
   CRITICAL: "border-red-500 text-red-400",
-}
+};
 
 export default function AlertsTab({
   alerts,
   loading,
 }: {
-  alerts: AlertItem[] | null
-  loading: boolean
+  alerts: AlertItem[] | null;
+  loading: boolean;
 }) {
-  if (loading) return <div className="text-gray-400">Loading alerts…</div>
+  if (loading) return <div className="text-gray-400">Loading alerts…</div>;
   if (!alerts || alerts.length === 0)
-    return <div className="text-gray-400">No alerts</div>
+    return <div className="text-gray-400">No alerts</div>;
 
   return (
     <div className="space-y-2">
@@ -36,5 +36,5 @@ export default function AlertsTab({
         </div>
       ))}
     </div>
-  )
+  );
 }

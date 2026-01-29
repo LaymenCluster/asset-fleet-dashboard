@@ -1,7 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Login from "./pages/Login"
-import Dashboard from "./pages/Dashboard"
-import { ProtectedRoute } from "./api/ProtectedRoute"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import { ProtectedRoute } from "./api/ProtectedRoute";
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

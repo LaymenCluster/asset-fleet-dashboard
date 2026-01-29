@@ -1,59 +1,66 @@
-import { useEffect, useState } from "react"
-import { fetchDeviceSummary, fetchDeviceHealthHistory, fetchDeviceAlerts } from "../../api/dashboard"
-import Tab from "./Tab"
-import AlertsTab from "./AlertsTab"
-import SummaryTab from "./SummaryTab"
-import HealthTab from "./HealthTab"
-import type { HealthHistoryItem } from "../../types/health"
-import type { AlertItem } from "../../types/alert"
+import { useEffect, useState } from "react";
+import {
+  fetchDeviceSummary,
+  fetchDeviceHealthHistory,
+  fetchDeviceAlerts,
+} from "../../api/dashboard";
+import Tab from "./Tab";
+import AlertsTab from "./AlertsTab";
+import SummaryTab from "./SummaryTab";
+import HealthTab from "./HealthTab";
+import type { HealthHistoryItem } from "../../types/health";
+import type { AlertItem } from "../../types/alert";
 
 type Props = {
-  deviceId: string
-}
+  deviceId: string;
+};
 
 export default function DeviceDetailsPane({ deviceId }: Props) {
-  const [summary, setSummary] = useState<any | null>(null)
-  const [activeTab, setActiveTab] =
-    useState<"summary" | "health" | "alerts">("summary")
+  const [summary, setSummary] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<"summary" | "health" | "alerts">(
+    "summary",
+  );
 
-  const [healthHistory, setHealthHistory] = useState<HealthHistoryItem[] | null>(null)
-  const [alerts, setAlerts] = useState<AlertItem[] | null>(null)
+  const [healthHistory, setHealthHistory] = useState<
+    HealthHistoryItem[] | null
+  >(null);
+  const [alerts, setAlerts] = useState<AlertItem[] | null>(null);
 
-  const [healthLoading, setHealthLoading] = useState(false)
-  const [alertsLoading, setAlertsLoading] = useState(false)
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [alertsLoading, setAlertsLoading] = useState(false);
 
   /* Always fetch summary */
   useEffect(() => {
-    setSummary(null)
-    setHealthHistory(null)
-    setAlerts(null)
-    setActiveTab("summary")
+    setSummary(null);
+    setHealthHistory(null);
+    setAlerts(null);
+    setActiveTab("summary");
 
-    fetchDeviceSummary(deviceId).then(setSummary)
-  }, [deviceId])
+    fetchDeviceSummary(deviceId).then(setSummary);
+  }, [deviceId]);
 
   /* Lazy load health */
   useEffect(() => {
-    if (activeTab !== "health" || healthHistory !== null) return
+    if (activeTab !== "health" || healthHistory !== null) return;
 
-    setHealthLoading(true)
+    setHealthLoading(true);
     fetchDeviceHealthHistory(deviceId)
       .then((res) => setHealthHistory(res.items))
-      .finally(() => setHealthLoading(false))
-  }, [activeTab, deviceId, healthHistory])
+      .finally(() => setHealthLoading(false));
+  }, [activeTab, deviceId, healthHistory]);
 
   /* Lazy load alerts */
   useEffect(() => {
-    if (activeTab !== "alerts" || alerts !== null) return
+    if (activeTab !== "alerts" || alerts !== null) return;
 
-    setAlertsLoading(true)
+    setAlertsLoading(true);
     fetchDeviceAlerts(deviceId)
       .then((res) => setAlerts(res.items))
-      .finally(() => setAlertsLoading(false))
-  }, [activeTab, deviceId, alerts])
+      .finally(() => setAlertsLoading(false));
+  }, [activeTab, deviceId, alerts]);
 
   if (!summary) {
-    return <div className="p-4 text-gray-400">Loading device…</div>
+    return <div className="p-4 text-gray-400">Loading device…</div>;
   }
 
   return (
@@ -66,9 +73,21 @@ export default function DeviceDetailsPane({ deviceId }: Props) {
 
       {/* Tabs */}
       <div className="flex border-b border-[#374151]">
-        <Tab label="Summary" active={activeTab === "summary"} onClick={() => setActiveTab("summary")} />
-        <Tab label="Health" active={activeTab === "health"} onClick={() => setActiveTab("health")} />
-        <Tab label="Alerts" active={activeTab === "alerts"} onClick={() => setActiveTab("alerts")} />
+        <Tab
+          label="Summary"
+          active={activeTab === "summary"}
+          onClick={() => setActiveTab("summary")}
+        />
+        <Tab
+          label="Health"
+          active={activeTab === "health"}
+          onClick={() => setActiveTab("health")}
+        />
+        <Tab
+          label="Alerts"
+          active={activeTab === "alerts"}
+          onClick={() => setActiveTab("alerts")}
+        />
       </div>
 
       {/* Content */}
@@ -84,5 +103,5 @@ export default function DeviceDetailsPane({ deviceId }: Props) {
         )}
       </div>
     </div>
-  )
+  );
 }

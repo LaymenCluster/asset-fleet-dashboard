@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "./config"
+import { API_BASE_URL } from "./config";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -30,7 +30,7 @@ apiClient.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

@@ -5,54 +5,46 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from "recharts"
-import type { HealthHistoryItem } from "../../types/health"
+} from "recharts";
+import type { HealthHistoryItem } from "../../types/health";
 
 type Props = {
-  history: HealthHistoryItem[] | null
-  loading: boolean
-}
+  history: HealthHistoryItem[] | null;
+  loading: boolean;
+};
 
-const WINDOW_HOURS = 24
+const WINDOW_HOURS = 24;
 
 function formatTime(ts: string) {
-  const d = new Date(ts)
+  const d = new Date(ts);
   return d.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
-  })
+  });
 }
 
 export default function HealthTab({ history, loading }: Props) {
   if (loading) {
-    return (
-      <div className="text-sm text-gray-400">
-        Loading health history…
-      </div>
-    )
+    return <div className="text-sm text-gray-400">Loading health history…</div>;
   }
   if (!history || history.length === 0)
-    return <div className="text-gray-400">No health records</div>
+    return <div className="text-gray-400">No health records</div>;
 
-  const cutoff =
-    Date.now() - WINDOW_HOURS * 60 * 60 * 1000
+  const cutoff = Date.now() - WINDOW_HOURS * 60 * 60 * 1000;
 
   const filtered = history
-    .filter(
-      (h) => new Date(h.changed_at).getTime() >= cutoff
-    )
+    .filter((h) => new Date(h.changed_at).getTime() >= cutoff)
     .sort(
       (a, b) =>
-        new Date(a.changed_at).getTime() -
-        new Date(b.changed_at).getTime()
-    )
+        new Date(a.changed_at).getTime() - new Date(b.changed_at).getTime(),
+    );
 
   if (!filtered.length) {
     return (
       <div className="text-sm text-gray-400">
         No health changes in the last 24 hours
       </div>
-    )
+    );
   }
 
   return (
@@ -64,18 +56,10 @@ export default function HealthTab({ history, loading }: Props) {
             tickFormatter={formatTime}
             tick={{ fill: "#9CA3AF", fontSize: 11 }}
           />
-          <YAxis
-            domain={[0, 100]}
-            tick={{ fill: "#9CA3AF", fontSize: 12 }}
-          />
+          <YAxis domain={[0, 100]} tick={{ fill: "#9CA3AF", fontSize: 12 }} />
           <Tooltip
-            labelFormatter={(label) =>
-              new Date(label).toLocaleString()
-            }
-            formatter={(value) => [
-              value,
-              "Health score",
-            ]}
+            labelFormatter={(label) => new Date(label).toLocaleString()}
+            formatter={(value) => [value, "Health score"]}
           />
           <Line
             type="monotone"
@@ -86,5 +70,5 @@ export default function HealthTab({ history, loading }: Props) {
         </LineChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

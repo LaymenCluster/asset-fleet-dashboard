@@ -1,21 +1,21 @@
-import FleetStatCard from "./FleetStatCard"
-import type { HealthFilter } from "../../pages/Dashboard"
+import FleetStatCard from "./FleetStatCard";
+import type { HealthFilter } from "../../pages/Dashboard";
 
 type Overview = {
-  total: number
-  active: number
-  watch: number
-  degraded: number
-  critical: number
-  unknown: number
-}
+  total: number;
+  active: number;
+  watch: number;
+  degraded: number;
+  critical: number;
+  unknown: number;
+};
 
 type Props = {
-  data: Overview
-  selected: HealthFilter
-  onSelect: (h: HealthFilter) => void
-  onReload?: () => void
-}
+  data: Overview;
+  selected: HealthFilter;
+  onSelect: (h: HealthFilter) => void;
+  onReload?: () => void;
+};
 
 export default function FleetOverviewCards({
   data,
@@ -82,5 +82,5 @@ export default function FleetOverviewCards({
         />
       </div>
     </section>
-  )
+  );
 }
