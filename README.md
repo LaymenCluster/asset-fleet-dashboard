@@ -1,73 +1,130 @@
-# React + TypeScript + Vite
+# Asset Fleet Monitoring Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Description:**
+Operations-focused web dashboard for observing, triaging, and administrating a fleet of monitored devices.
+The dashboard is a read-heavy control surface that consumes precomputed state from the backend and exposes it in a human-friendly, decision-oriented UI.
 
-Currently, two official plugins are available:
+This repository does not handle telemetry, health computation, or alert generation — those concerns live entirely in the backend service.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Primary Responsibilities
 
-## React Compiler
+The dashboard exists to answer operator questions quickly:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Which devices are unhealthy right now?
+- What changed recently?
+- Is this device degraded or fully down?
+- Can I safely decommission or disable it?
+- Are alerts flapping or stable?
 
-## Expanding the ESLint configuration
+It intentionally avoids business logic beyond UI-level aggregation and filtering.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### What This Dashboard Is (and Is Not)
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+**_This is:_**
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- A read-optimized admin dashboard
+- An operational visibility layer
+- A thin client over backend APIs
+- A place for controlled admin actions (register, decommission, reactivate)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+**_This is NOT:_**
+
+- A telemetry processor
+- A health engine
+- An alerting system
+- A generic end-user app
+
+### Core Capabilities
+
+- Fleet-wide device overview
+- Real-time-ish device health status
+- Drill-down device detail views
+- Alert history inspection
+- Device lifecycle actions (admin-only):
+  - Register device
+  - Decommission device
+  - Reactivate device
+- Filtering, sorting, and search for large fleets
+
+### UI Architecture & Data Flow
+
+```mermaid
+flowchart LR
+    Browser["Web Browser"] --> Dashboard["Dashboard UI"]
+
+    Dashboard --> API_Read["Backend Read APIs"]
+    Dashboard --> API_Control["Backend Control APIs"]
+
+    API_Read --> DB["Precomputed State"]
+    API_Read --> Cache["Redis Cache"]
+
+    API_Control --> DeviceService["Lifecycle APIs"]
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Tech Stack
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+- Frontend: React (TypeScript)
+- State Management: Query-based
+- Styling: Tailwind
+- Build Tooling: Vite
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+### Role Model & Access Control
+
+The dashboard assumes pre-provisioned users, consistent with the backend.
+
+**_Admin_**
+
+- Perform Device Lifecycle changes
+- Full fleet visibility
+
+**_Viewer_**
+
+- Read-only access
+- Can view devices, health, and alerts
+- No destructive actions
+
+There is no public signup and no client-side auth logic beyond token handling.
+SSO / RBAC enforcement is backend-owned.
+
+### Local Development
+
+**_Prerequisites_**
+
+- Node.js (LTS)
+- Docker (for backend dependency)
+- Backend service running locally at http://localhost:8000
+
+**_Clone project and then:_**
+
 ```
+npm install
+npm run dev
+```
+
+### Environment Configuration
+
+The dashboard does not manage secrets — tokens are assumed to be injected via dev tooling or reverse proxy in real deployments.
+
+### Design Notes
+
+- Server state is treated as the source of truth.
+- UI state is kept minimal and ephemeral.
+- Expensive operations (filtering, pagination) are delegated to backend APIs where possible.
+- All destructive actions require explicit confirmation to reduce operator error.
+
+### Future Enhancements
+
+The dashboard is intentionally minimal but can evolve to support:
+
+- Live updates via WebSockets or Server-Sent Events
+- Saved views and fleet-level presets
+- Bulk actions for large fleets
+- Embedded operational metrics (latency, ingestion lag)
+- Audit visibility
+
+### Notes
+
+- This repository is a frontend systems showcase
+- Backend is the authoritative system of record
+- UI logic should remain shallow and reversible
+- Business rules must not creep into UI

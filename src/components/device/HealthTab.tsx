@@ -13,44 +13,71 @@ type Props = {
   loading: boolean;
 };
 
-const WINDOW_HOURS = 24;
+/**
+ * Aggregate health history by minute, keeping nulls
+ * - Multiple points in same minute are averaged if not null
+ * - Null scores remain null to create gaps
+ */
+function aggregateByMinute(history: HealthHistoryItem[]) {
+  const buckets = new Map<
+    string,
+    { sum: number; count: number; hasValue: boolean }
+  >();
 
+  for (const h of history) {
+    const d = new Date(h.changed_at);
+    d.setSeconds(0, 0); // round down to minute
+    const key = d.toISOString();
+
+    const prev = buckets.get(key) ?? { sum: 0, count: 0, hasValue: false };
+    if (h.score != null) {
+      prev.sum += h.score;
+      prev.count += 1;
+      prev.hasValue = true;
+    }
+    buckets.set(key, prev);
+  }
+
+  return Array.from(buckets.entries())
+    .map(([changed_at, v]) => ({
+      changed_at,
+      score: v.hasValue ? Math.round(v.sum / v.count) : null,
+    }))
+    .sort(
+      (a, b) =>
+        new Date(a.changed_at).getTime() - new Date(b.changed_at).getTime(),
+    );
+}
+
+/**
+ * Format X-axis labels as HH:MM
+ */
 function formatTime(ts: string) {
   const d = new Date(ts);
-  return d.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 export default function HealthTab({ history, loading }: Props) {
   if (loading) {
     return <div className="text-sm text-gray-400">Loading health history…</div>;
   }
-  if (!history || history.length === 0)
+
+  if (!history || history.length === 0) {
     return <div className="text-gray-400">No health records</div>;
+  }
 
-  const cutoff = Date.now() - WINDOW_HOURS * 60 * 60 * 1000;
+  const data = aggregateByMinute(history);
 
-  const filtered = history
-    .filter((h) => new Date(h.changed_at).getTime() >= cutoff)
-    .sort(
-      (a, b) =>
-        new Date(a.changed_at).getTime() - new Date(b.changed_at).getTime(),
-    );
-
-  if (!filtered.length) {
+  if (!data.length) {
     return (
-      <div className="text-sm text-gray-400">
-        No health changes in the last 24 hours
-      </div>
+      <div className="text-sm text-gray-400">No health data available</div>
     );
   }
 
   return (
     <div className="w-full h-64">
       <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={filtered}>
+        <LineChart data={data}>
           <XAxis
             dataKey="changed_at"
             tickFormatter={formatTime}
@@ -66,6 +93,8 @@ export default function HealthTab({ history, loading }: Props) {
             dataKey="score"
             stroke="#3B82F6"
             strokeWidth={2}
+            dot={false}
+            connectNulls={false} // important: preserves gaps
           />
         </LineChart>
       </ResponsiveContainer>

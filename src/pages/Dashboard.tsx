@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import FleetOverviewCards from "../components/fleet/FleetOverviewCards";
-import DeviceList from "../components/DeviceList";
+import DeviceList from "../components/device/DeviceList";
 import DeviceDetailsPane from "../components/device/DeviceDetailsPane";
 import { fetchOverview } from "../api/dashboard";
 
@@ -10,6 +10,8 @@ export type HealthFilter =
   | "DEGRADED"
   | "CRITICAL"
   | "UNKNOWN"
+  | "DECOMMISSIONED"
+  | "REGISTERED"
   | null;
 
 export default function Dashboard() {

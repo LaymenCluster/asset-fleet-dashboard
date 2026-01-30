@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   fetchDeviceSummary,
   fetchDeviceHealthHistory,
@@ -17,58 +17,79 @@ type Props = {
 
 export default function DeviceDetailsPane({ deviceId }: Props) {
   const [summary, setSummary] = useState<any | null>(null);
-  const [activeTab, setActiveTab] = useState<"summary" | "health" | "alerts">(
-    "summary",
-  );
-
   const [healthHistory, setHealthHistory] = useState<
     HealthHistoryItem[] | null
   >(null);
   const [alerts, setAlerts] = useState<AlertItem[] | null>(null);
 
+  const [activeTab, setActiveTab] = useState<"summary" | "health" | "alerts">(
+    "summary",
+  );
+
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const [healthLoading, setHealthLoading] = useState(false);
   const [alertsLoading, setAlertsLoading] = useState(false);
 
-  /* Always fetch summary */
-  useEffect(() => {
-    setSummary(null);
-    setHealthHistory(null);
-    setAlerts(null);
-    setActiveTab("summary");
-
-    fetchDeviceSummary(deviceId).then(setSummary);
+  const loadSummary = useCallback(async () => {
+    setSummaryLoading(true);
+    try {
+      const res = await fetchDeviceSummary(deviceId);
+      setSummary(res);
+    } finally {
+      setSummaryLoading(false);
+    }
   }, [deviceId]);
 
-  /* Lazy load health */
-  useEffect(() => {
-    if (activeTab !== "health" || healthHistory !== null) return;
-
+  const loadHealth = useCallback(async () => {
     setHealthLoading(true);
-    fetchDeviceHealthHistory(deviceId)
-      .then((res) => setHealthHistory(res.items))
-      .finally(() => setHealthLoading(false));
-  }, [activeTab, deviceId, healthHistory]);
+    try {
+      const res = await fetchDeviceHealthHistory(deviceId);
+      setHealthHistory(res.items);
+    } finally {
+      setHealthLoading(false);
+    }
+  }, [deviceId]);
 
-  /* Lazy load alerts */
-  useEffect(() => {
-    if (activeTab !== "alerts" || alerts !== null) return;
-
+  const loadAlerts = useCallback(async () => {
     setAlertsLoading(true);
-    fetchDeviceAlerts(deviceId)
-      .then((res) => setAlerts(res.items))
-      .finally(() => setAlertsLoading(false));
-  }, [activeTab, deviceId, alerts]);
+    try {
+      const res = await fetchDeviceAlerts(deviceId);
+      setAlerts(res.items);
+    } finally {
+      setAlertsLoading(false);
+    }
+  }, [deviceId]);
 
-  if (!summary) {
+  const loadAll = useCallback(() => {
+    loadSummary();
+    loadHealth();
+    loadAlerts();
+  }, [loadSummary, loadHealth, loadAlerts]);
+
+  // initial load on deviceId change
+  useEffect(() => {
+    loadAll();
+  }, [deviceId, loadAll]);
+
+  if (summaryLoading || !summary) {
     return <div className="p-4 text-gray-400">Loading device…</div>;
   }
 
   return (
     <div className="flex flex-col h-full bg-[#1f2937] rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-[#374151]">
-        <div className="font-semibold">{summary.name}</div>
-        <div className="text-sm text-gray-400">{summary.model}</div>
+      <div className="p-4 border-b border-[#374151] flex justify-between items-center">
+        <div>
+          <div className="font-semibold">{summary.name}</div>
+          <div className="text-sm text-gray-400">{summary.model}</div>
+        </div>
+
+        <button
+          onClick={loadAll}
+          className="px-3 py-1 rounded bg-blue-600 text-sm hover:bg-blue-700"
+        >
+          Reload
+        </button>
       </div>
 
       {/* Tabs */}
@@ -93,11 +114,9 @@ export default function DeviceDetailsPane({ deviceId }: Props) {
       {/* Content */}
       <div className="flex-1 overflow-auto p-4">
         {activeTab === "summary" && <SummaryTab summary={summary} />}
-
         {activeTab === "health" && (
           <HealthTab loading={healthLoading} history={healthHistory} />
         )}
-
         {activeTab === "alerts" && (
           <AlertsTab loading={alertsLoading} alerts={alerts} />
         )}

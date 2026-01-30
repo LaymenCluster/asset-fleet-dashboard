@@ -8,6 +8,8 @@ type Overview = {
   degraded: number;
   critical: number;
   unknown: number;
+  decommissioned: number;
+  registered: number;
 };
 
 type Props = {
@@ -38,7 +40,7 @@ export default function FleetOverviewCards({
         )}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4">
         <FleetStatCard
           label="Total"
           value={data.total}
@@ -79,6 +81,20 @@ export default function FleetOverviewCards({
           accent="gray"
           active={selected === "UNKNOWN"}
           onClick={() => onSelect("UNKNOWN")}
+        />
+        <FleetStatCard
+          label="Decommissioned"
+          value={data.decommissioned}
+          accent="gray"
+          active={selected === "DECOMMISSIONED"}
+          onClick={() => onSelect("DECOMMISSIONED")}
+        />
+        <FleetStatCard
+          label="Registered"
+          value={data.registered}
+          accent="gray"
+          active={selected === "REGISTERED"}
+          onClick={() => onSelect("REGISTERED")}
         />
       </div>
     </section>

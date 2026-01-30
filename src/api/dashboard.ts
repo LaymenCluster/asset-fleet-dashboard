@@ -33,3 +33,17 @@ export const fetchDeviceHealthHistory = async (id: string) => {
   const res = await apiClient.get(`/dashboard/devices/${id}/health-history`);
   return res.data;
 };
+
+export const decommissionDevice = (id: string) =>
+  apiClient.patch(`/devices/${id}/decommission`);
+
+export const reactivateDevice = (id: string) =>
+  apiClient.patch(`/devices/${id}/reactivate`);
+
+export const registerDevice = (payload: {
+  vendor_name: string;
+  vendor_id: string;
+  device_identifier: string;
+  device_name: string;
+  device_model: string;
+}) => apiClient.post("/devices/registration", payload);
