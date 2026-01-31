@@ -1,4 +1,5 @@
 import { Trash2, RotateCcw } from "lucide-react";
+import { isAdmin } from "../../api/auth";
 import { decommissionDevice, reactivateDevice } from "../../api/dashboard";
 
 type Props = {
@@ -31,7 +32,7 @@ export function DeviceLifecycleActions({ d }: Props) {
     <div className="flex items-center gap-3">
       <span className="text-sm font-medium">{d.health_state}</span>
 
-      {d.lifecycle_state !== "DECOMMISSIONED" && (
+      { isAdmin() && d.lifecycle_state !== "DECOMMISSIONED" && (
         <button
           onClick={() =>
             confirmAndRun("Decommission this device?", () =>
@@ -45,7 +46,7 @@ export function DeviceLifecycleActions({ d }: Props) {
         </button>
       )}
 
-      {d.lifecycle_state === "DECOMMISSIONED" && (
+      { isAdmin() &&d.lifecycle_state === "DECOMMISSIONED" && (
         <button
           onClick={() =>
             confirmAndRun("Reactivate this device?", () =>
