@@ -21,16 +21,13 @@ export function RegisterDeviceModal({ onClose, onSuccess }: Props) {
   const submit = async () => {
     setLoading(true);
     setError(null);
+
     try {
       await registerDevice(form);
       onSuccess();
       onClose();
     } catch (e: any) {
-      if (e.response?.status === 409) {
-        setError("Device already registered or previously decommissioned.");
-      } else {
-        setError("Failed to register device.");
-      }
+      setError(e.message ?? "Failed to register device.");
     } finally {
       setLoading(false);
     }

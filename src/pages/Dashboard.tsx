@@ -42,6 +42,7 @@ export default function Dashboard() {
         <button
           onClick={() => {
             localStorage.removeItem("access_token");
+            localStorage.removeItem("role");
             window.location.href = "/login";
           }}
           className="px-4 py-2 rounded bg-[#374151] hover:bg-[#4b5563] text-sm"

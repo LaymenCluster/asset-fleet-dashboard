@@ -1,3 +1,4 @@
+import { isAdmin } from "../../api/auth";
 import { DeviceLifecycleActions } from "../device/DeviceLifecycleActions";
 
 type Device = {
@@ -29,7 +30,7 @@ export function DeviceItem({ device, selected, onSelect }: Props) {
         <div className="text-sm text-gray-400">{device.model}</div>
       </div>
 
-      <DeviceLifecycleActions d={device} />
+      {isAdmin() && <DeviceLifecycleActions d={device} />}
     </div>
   );
 }

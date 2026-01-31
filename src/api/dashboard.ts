@@ -1,4 +1,5 @@
 import apiClient from "./apiClient";
+import axios from "axios";
 
 export const fetchOverview = async () => {
   const res = await apiClient.get("/dashboard/overview");
@@ -34,16 +35,41 @@ export const fetchDeviceHealthHistory = async (id: string) => {
   return res.data;
 };
 
-export const decommissionDevice = (id: string) =>
-  apiClient.patch(`/devices/${id}/decommission`);
+export async function decommissionDevice(id: string): Promise<void> {
+  try {
+    await apiClient.patch(`/devices/${id}/decommission`);
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 409) {
+      return;
+    }
+    throw err;
+  }
+}
 
-export const reactivateDevice = (id: string) =>
-  apiClient.patch(`/devices/${id}/reactivate`);
+export async function reactivateDevice(id: string): Promise<void> {
+  try {
+    await apiClient.patch(`/devices/${id}/reactivate`);
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 409) {
+      return;
+    }
+    throw err;
+  }
+}
 
-export const registerDevice = (payload: {
+export async function registerDevice(payload: {
   vendor_name: string;
   vendor_id: string;
   device_identifier: string;
   device_name: string;
   device_model: string;
-}) => apiClient.post("/devices/registration", payload);
+}): Promise<void> {
+  try {
+    await apiClient.post("/devices/registration", payload);
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 409) {
+      throw new Error("Device already registered");
+    }
+    throw err;
+  }
+}

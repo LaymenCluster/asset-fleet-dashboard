@@ -1,6 +1,6 @@
 import { useState } from "react";
 import apiClient from "../api/apiClient";
-import { setToken } from "../api/auth";
+import { setToken, setUserRole } from "../api/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,6 +20,7 @@ export default function Login() {
       });
 
       setToken(res.data.access_token);
+      setUserRole(res.data.role);
       window.location.href = "/dashboard";
     } catch (err: any) {
       setError("Invalid email or password");

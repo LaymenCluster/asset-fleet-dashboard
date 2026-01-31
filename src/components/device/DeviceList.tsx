@@ -5,6 +5,7 @@ import { DeviceItem } from "./DeviceItem";
 import { PaginationControls } from "./PaginationControls";
 import { CONFIG } from "../../config";
 import type { HealthFilter } from "../../pages/Dashboard";
+import { isAdmin } from "../../api/auth";
 
 type Device = {
   device_id: string;
@@ -89,12 +90,14 @@ export default function DeviceList({
             Reload
           </button>
 
-          <button
-            onClick={() => setShowRegister(true)}
-            className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-sm"
-          >
-            + Register Device
-          </button>
+          {isAdmin() && (
+            <button
+              onClick={() => setShowRegister(true)}
+              className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-sm"
+            >
+              + Register Device
+            </button>
+          )}
         </div>
       </header>
 
@@ -123,7 +126,7 @@ export default function DeviceList({
         }}
       />
 
-      {showRegister && (
+      {isAdmin() && showRegister && (
         <RegisterDeviceModal
           onClose={() => setShowRegister(false)}
           onSuccess={() => {
