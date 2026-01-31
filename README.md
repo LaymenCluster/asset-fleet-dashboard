@@ -6,7 +6,7 @@ The dashboard is a read-heavy control surface that consumes precomputed state fr
 
 This repository does not handle telemetry, health computation, or alert generation — those concerns live entirely in the backend service.
 
-**[Project Demo](https://drive.google.com/file/d/11vQUOplxwlXCqHWmwTyyIRvrTvNcixUX/view?usp=sharing)**
+**[![Demo Video](assets/demo-thumbnail.png)](https://drive.google.com/file/d/11vQUOplxwlXCqHWmwTyyIRvrTvNcixUX/view)**
 
 ### Primary Responsibilities
 
